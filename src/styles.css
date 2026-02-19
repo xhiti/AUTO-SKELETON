@@ -1,0 +1,202 @@
+/**
+ * @xhiti/auto-skeleton — Optional Styles
+ *
+ * These styles are OPTIONAL if you're using Tailwind CSS with shadcn/ui.
+ * The AutoSkeleton component uses Tailwind utility classes by default.
+ *
+ * Import this file if you need:
+ * - Shimmer/wave animation keyframes (not included in Tailwind by default)
+ * - CSS custom properties for theming in non-Tailwind projects
+ * - Fallback styles for projects not using Tailwind
+ *
+ * Usage:
+ *   import "@xhiti/auto-skeleton/styles.css";
+ */
+
+/* ======================================================================== */
+/* CSS Custom Properties                                                     */
+/* ======================================================================== */
+
+:root {
+    --skeleton-pulse-duration: 1.5s;
+    --skeleton-shimmer-duration: 1.8s;
+    --skeleton-wave-duration: 2s;
+    --skeleton-bg-color: var(--muted, hsl(240 4.8% 95.9%));
+    --skeleton-shine-color: var(--muted-foreground, hsl(240 3.8% 46.1%));
+    --skeleton-border-radius: 0.25rem;
+}
+
+/* Dark mode support (works with next-themes and standard .dark class) */
+.dark,
+[data-theme="dark"] {
+    --skeleton-bg-color: var(--muted, hsl(240 3.7% 15.9%));
+    --skeleton-shine-color: var(--muted-foreground, hsl(240 5% 64.9%));
+}
+
+/* ======================================================================== */
+/* Pulse Animation (default)                                                 */
+/* ======================================================================== */
+
+@keyframes skeleton-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.skeleton-pulse {
+    animation: skeleton-pulse var(--skeleton-pulse-duration) ease-in-out infinite;
+}
+
+/* ======================================================================== */
+/* Shimmer Animation                                                         */
+/* A horizontal shine sweep across the skeleton surface.                     */
+/* ======================================================================== */
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(90deg,
+            var(--skeleton-bg-color) 25%,
+            color-mix(in srgb, var(--skeleton-bg-color) 60%, transparent) 37%,
+            color-mix(in srgb, var(--skeleton-shine-color) 10%, var(--skeleton-bg-color) 90%) 50%,
+            color-mix(in srgb, var(--skeleton-bg-color) 60%, transparent) 63%,
+            var(--skeleton-bg-color) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer var(--skeleton-shimmer-duration) ease-in-out infinite;
+}
+
+/* ======================================================================== */
+/* Wave Animation                                                            */
+/* A subtle vertical wave effect.                                            */
+/* ======================================================================== */
+
+@keyframes skeleton-wave {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+
+    25% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scaleY(0.98);
+    }
+
+    75% {
+        opacity: 0.6;
+    }
+}
+
+.skeleton-wave {
+    animation: skeleton-wave var(--skeleton-wave-duration) ease-in-out infinite;
+    transform-origin: center;
+}
+
+/* ======================================================================== */
+/* Fallback Utility Classes (for non-Tailwind projects)                      */
+/* ======================================================================== */
+
+/* Text skeleton – hides text while preserving dimensions */
+.skeleton-text {
+    color: transparent !important;
+    background-color: var(--skeleton-bg-color);
+    border-radius: var(--skeleton-border-radius);
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Image skeleton */
+.skeleton-image {
+    background-color: var(--skeleton-bg-color);
+    border-radius: var(--skeleton-border-radius);
+}
+
+/* Icon skeleton */
+.skeleton-icon {
+    color: transparent !important;
+    background-color: color-mix(in srgb, var(--skeleton-bg-color) 50%, transparent);
+    border-radius: 50%;
+}
+
+/* Button skeleton overlay */
+.skeleton-button {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.skeleton-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--skeleton-bg-color);
+    border-radius: inherit;
+    animation: skeleton-pulse var(--skeleton-pulse-duration) ease-in-out infinite;
+}
+
+/* Table cell skeleton */
+.skeleton-table-cell {
+    background-color: var(--skeleton-bg-color);
+    border-radius: var(--skeleton-border-radius);
+}
+
+/* Input/form field skeleton */
+.skeleton-input {
+    background-color: var(--skeleton-bg-color);
+    border-color: var(--skeleton-bg-color);
+    color: transparent !important;
+    pointer-events: none;
+}
+
+/* Badge/chip skeleton */
+.skeleton-badge {
+    background-color: var(--skeleton-bg-color);
+    color: transparent !important;
+}
+
+/* Avatar skeleton */
+.skeleton-avatar {
+    background-color: var(--skeleton-bg-color);
+    border-radius: 50%;
+}
+
+/* ======================================================================== */
+/* AutoSkeleton Wrapper                                                      */
+/* ======================================================================== */
+
+.auto-skeleton-wrapper {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Screen reader only utility (fallback if not using Tailwind sr-only) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

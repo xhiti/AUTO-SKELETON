@@ -1,0 +1,133 @@
+# Publish to npm — Runs when code is pushed/merged to `production`
+#
+# Workflow:
+#   1. development → staging (PR + merge for testing)
+#   2. staging → production (PR + merge to release)
+#   3. This workflow triggers on production push → publishes to npm
+#
+# Required secrets:
+#   NPM_TOKEN — npm access token with publish permissions
+#              Generate at: https://www.npmjs.com/settings/~/tokens
+#              Add at: GitHub repo → Settings → Secrets → Actions
+
+name: Publish to npm
+
+on:
+  push:
+    branches: [production]
+
+# Prevent concurrent publishes
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  # ── Step 1: Validate before publishing ──
+  validate:
+    name: Validate Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Build package
+        run: npm run build
+
+      - name: Verify dist output
+        run: |
+          test -f dist/index.js || (echo "❌ Missing dist/index.js" && exit 1)
+          test -f dist/index.cjs || (echo "❌ Missing dist/index.cjs" && exit 1)
+          test -f dist/index.d.ts || (echo "❌ Missing dist/index.d.ts" && exit 1)
+          test -f dist/styles.css || (echo "❌ Missing dist/styles.css" && exit 1)
+          echo "✅ All expected files present"
+
+  # ── Step 2: Publish to npm ──
+  publish:
+    name: Publish to npm
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Get package version
+        id: pkg
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Publishing version: $VERSION"
+
+      - name: Check if version already published
+        id: check
+        run: |
+          PUBLISHED=$(npm view @xhiti/auto-skeleton version 2>/dev/null || echo "not-found")
+          CURRENT=${{ steps.pkg.outputs.version }}
+          if [ "$PUBLISHED" = "$CURRENT" ]; then
+            echo "⚠️ Version $CURRENT already published — skipping"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🚀 New version $CURRENT will be published (current published: $PUBLISHED)"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to npm
+        if: steps.check.outputs.skip != 'true'
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Git tag
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          VERSION=${{ steps.pkg.outputs.version }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.skip != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.pkg.outputs.version }}
+          name: v${{ steps.pkg.outputs.version }}
+          body: |
+            ## 📦 @xhiti/auto-skeleton v${{ steps.pkg.outputs.version }}
+
+            Published to npm: [`@xhiti/auto-skeleton@${{ steps.pkg.outputs.version }}`](https://www.npmjs.com/package/@xhiti/auto-skeleton/v/${{ steps.pkg.outputs.version }})
+
+            ```bash
+            npm install @xhiti/auto-skeleton@${{ steps.pkg.outputs.version }}
+            ```
+          generate_release_notes: true

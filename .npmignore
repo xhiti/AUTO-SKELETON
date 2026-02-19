@@ -1,0 +1,24 @@
+# Source files
+src/
+
+# Config files
+tsconfig.json
+tsup.config.ts
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Development
+node_modules/
+.git/
+.github/
+.vscode/
+.idea/
+
+# Build artifacts (keep dist/)
+*.tsbuildinfo
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log

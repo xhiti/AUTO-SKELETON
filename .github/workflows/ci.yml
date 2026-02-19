@@ -1,0 +1,55 @@
+# CI - Runs on every push and PR to development/staging
+# Validates code quality: typecheck + build
+
+name: CI
+
+on:
+  push:
+    branches: [development, staging]
+  pull_request:
+    branches: [development, staging, production]
+
+jobs:
+  ci:
+    name: Typecheck & Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Build package
+        run: npm run build
+
+      - name: Verify dist output
+        run: |
+          echo "=== Checking dist/ contents ==="
+          ls -la dist/
+          test -f dist/index.js || (echo "❌ Missing dist/index.js" && exit 1)
+          test -f dist/index.cjs || (echo "❌ Missing dist/index.cjs" && exit 1)
+          test -f dist/index.d.ts || (echo "❌ Missing dist/index.d.ts" && exit 1)
+          test -f dist/index.d.cts || (echo "❌ Missing dist/index.d.cts" && exit 1)
+          test -f dist/styles.css || (echo "❌ Missing dist/styles.css" && exit 1)
+          echo "✅ All expected files present"
+
+      - name: Check package size
+        run: |
+          echo "=== Package contents ==="
+          npx -y package-size-report || true
+          npm pack --dry-run 2>&1

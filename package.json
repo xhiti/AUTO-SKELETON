@@ -1,0 +1,92 @@
+{
+    "name": "@xhiti/auto-skeleton",
+    "version": "1.0.0",
+    "description": "A runtime React component that transforms your actual UI into pixel-perfect, responsive skeleton loaders automatically. No more duplicate JSX for loading states.",
+    "keywords": [
+        "react",
+        "skeleton",
+        "skeleton-loader",
+        "loading",
+        "placeholder",
+        "shadcn",
+        "shadcn-ui",
+        "radix-ui",
+        "tailwind",
+        "tailwindcss",
+        "auto-skeleton",
+        "ghost-rendering",
+        "responsive",
+        "dark-mode",
+        "next-themes",
+        "nextjs",
+        "react-skeleton",
+        "loading-state",
+        "pixel-perfect"
+    ],
+    "author": "xhiti",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xhiti/auto-skeleton"
+    },
+    "bugs": {
+        "url": "https://github.com/xhiti/auto-skeleton/issues"
+    },
+    "homepage": "https://github.com/xhiti/auto-skeleton#readme",
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            },
+            "require": {
+                "types": "./dist/index.d.cts",
+                "default": "./dist/index.cjs"
+            }
+        },
+        "./styles.css": "./dist/styles.css"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "sideEffects": [
+        "**/*.css"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "lint": "eslint src --ext .ts,.tsx",
+        "typecheck": "tsc --noEmit",
+        "prepublishOnly": "npm run build",
+        "clean": "rimraf dist"
+    },
+    "peerDependencies": {
+        "react": ">=18.0.0",
+        "react-dom": ">=18.0.0"
+    },
+    "peerDependenciesMeta": {
+        "react-dom": {
+            "optional": true
+        }
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.0",
+        "@types/react-dom": "^18.2.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "tsup": "^8.0.0",
+        "typescript": "^5.3.0"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}
