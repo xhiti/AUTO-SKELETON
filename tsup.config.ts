@@ -14,10 +14,6 @@ export default defineConfig([
         treeshake: true,
         esbuildOptions(options) {
             options.jsx = "automatic";
-            // Preserve "use client" directive for Next.js App Router
-            options.banner = {
-                js: '"use client";',
-            };
         },
     },
     // CSS bundle (copy styles to dist)

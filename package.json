@@ -1,6 +1,6 @@
 {
     "name": "@xhiti/auto-skeleton",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A runtime React component that transforms your actual UI into pixel-perfect, responsive skeleton loaders automatically. No more duplicate JSX for loading states.",
     "keywords": [
         "react",
@@ -27,7 +27,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/xhiti/auto-skeleton"
+        "url": "git+https://github.com/xhiti/auto-skeleton.git"
     },
     "bugs": {
         "url": "https://github.com/xhiti/auto-skeleton/issues"
